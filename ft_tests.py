@@ -32,7 +32,7 @@ class NewVisitorTest(unittest.TestCase):  # 测试组织成类的形式，继承
         )
         input_box.send_keys('Buy peacock feathers')
         # 她按回车键后，页面更新了
-        input_box.send_keys(keys.Key.Enter)
+        input_box.send_keys(keys.Keys.ENTER)
         time.sleep(1)
         # 在待办事项表格中显示了“1: Buy peacock feathers”
         table = self.browser.find_element_by_id('id_list_table')
