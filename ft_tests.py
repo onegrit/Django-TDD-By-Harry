@@ -16,7 +16,7 @@ class NewVisitorTest(unittest.TestCase):  # 测试组织成类的形式，继承
         self.browser.get('http://localhost:8010')
         # 她注意到网页的标题和头部都包含“To-Do”这个词
         self.assertIn("To-Do", self.browser.title)
-        self.fail('Finish the test!')
+        # self.fail('Finish the test!')
 
         # 她在文本框中输入了“Buy peacock feathers” （购买孔雀羽毛）
         # 伊迪丝的爱好是使用假蝇做饵钓鱼
