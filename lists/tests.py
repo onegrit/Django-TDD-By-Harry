@@ -25,32 +25,6 @@ class HomePageTest(TestCase):
 
         self.assertTemplateUsed(response, 'home.html')
 
-    def test_only_saves_items_when_necessary(self):
-        """"""
-        response = self.client.get('/')
-        self.assertEqual(Item.objects.count(), 0)
-
-    def test_can_save_a_post_request(self):
-        """前端UT:保存用户表单输入的POST请求数据"""
-        self.client.post('/', data={'item_text': 'A new list item'})  # 此处的item_text是模板中input的name
-
-        # 断言:POST后的数据数量
-        self.assertEqual(Item.objects.count(), 1)
-
-        # 断言：取出的数据和保存的数据是否相同
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, 'A new list item')
-
-    def test_redirects_after_post(self):
-        """UT:POST请求后应该重定向到list页面"""
-        response = self.client.post('/', data={'item_text': 'A new list item'})  # 此处的item_text是模板中input的name
-
-        # 重定向到列表页面
-        # 断言：response的状态码
-        self.assertEqual(response.status_code, 302)
-        # 断言：response的location
-        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
-
 
 class ItemModelTest(TestCase):
     """Model测试:待办事项"""
@@ -88,3 +62,28 @@ class ListViewTest(TestCase):
         response = self.client.get('/lists/the-only-list-in-the-world/')
 
         self.assertTemplateUsed(response, 'list.html')
+
+
+class NewListTest(TestCase):
+    def test_can_save_a_post_request(self):
+        """前端UT:保存用户表单输入的POST请求数据"""
+        self.client.post('/lists/new', data={'item_text': 'A new list item'})  # 此处的item_text是模板中input的name
+
+        # 断言:POST后的数据数量
+        self.assertEqual(Item.objects.count(), 1)
+
+        # 断言：取出的数据和保存的数据是否相同
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'A new list item')
+
+    def test_redirects_after_post(self):
+        """UT:POST请求后应该重定向到list页面"""
+        response = self.client.post('/lists/new', data={'item_text': 'A new list item'})  # 此处的item_text是模板中input的name
+
+        # 重定向到列表页面
+        # 断言：response的状态码
+        # self.assertEqual(response.status_code, 302)
+        # 断言：response的location
+        # self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
+        # 重构：使用assertRedirect重构上面的代码
+        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')

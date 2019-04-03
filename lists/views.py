@@ -17,9 +17,7 @@ def home_page(request: HttpRequest):
     # 重构上面3行代码，解决“每次GET请求都保存了一个空的待办事项”的问题
 
     # POST请求后应该重定向到列表页面
-    if request.method == 'POST':
-        Item.objects.create(text=request.POST['item_text'])
-        return redirect('/lists/the-only-list-in-the-world/')
+
     # 处理GET请求,在首页（列表页）显示待办事项列表
     return render(request, 'home.html')
 
@@ -27,3 +25,8 @@ def home_page(request: HttpRequest):
 def view_list(request):
     items = Item.objects.all()
     return render(request, 'list.html', {'items': items})
+
+
+def new_list(request):
+    Item.objects.create(text=request.POST['item_text'])
+    return redirect('/lists/the-only-list-in-the-world/')
