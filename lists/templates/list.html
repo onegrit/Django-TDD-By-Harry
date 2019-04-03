@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>To-Do</title>
-</head>
-<body>
-<h1>To-Do list</h1>
-<!--编写Form，接受用户输入，发送POST请求-->
-<form action="/lists/{{ list.id }}/add_item" method="post">
-    {% csrf_token %}
-    <input type="text" id="id_new_item" name="item_text" placeholder="Enter a to-do item">
-</form>
-<table id="id_list_table">
-    {% for item in list.item_set.all %}
-        <tr>
-            <td>{{ forloop.counter }}: {{ item.text }}</td>
-        </tr>
-    {% endfor %}
-</table>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block header_text %}
+    To-Do list
+{% endblock %}
+{% block form_action %}
+    /lists/{{ list.id }}/add_item
+{% endblock %}
+{% block table %}
+    <table id="id_list_table">
+        {% for item in list.item_set.all %}
+            <tr>
+                <td>{{ forloop.counter }}: {{ item.text }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
