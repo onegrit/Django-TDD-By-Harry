@@ -2,6 +2,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
 from .views import home_page
+from .models import  Item
 
 
 class HomePageTest(TestCase):
@@ -27,3 +28,23 @@ class HomePageTest(TestCase):
         response = self.client.post('/', data={'item_text': 'A new list item'})
         self.assertIn('A new list item', response.content.decode())
         self.assertTemplateUsed(response, 'home.html')
+
+
+class ItemModelTest(TestCase):
+    """Model测试:待办事项"""
+    def test_saving_and_retrieving_items(self):
+        first_item = Item()  # 创建对象
+        first_item.text = "The first list item"  # 为对象属性赋值
+        first_item.save()
+
+        second_item = Item()
+        second_item.text = "The second list item"
+        second_item.save()
+
+        saved_items = Item.objects.all()  # 查询API，all是取回表中全部记录，得到的是类似列表的对象QuerySet
+        self.assertEqual(saved_items.count(), 2)
+
+        first_saved_item = saved_items[0]
+        second_saved_item = saved_items[1]
+        self.assertEqual(first_item, first_saved_item)
+        self.assertEqual(second_saved_item, second_item)
