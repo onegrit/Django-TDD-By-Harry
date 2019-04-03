@@ -2,7 +2,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
 from .views import home_page
-from .models import  Item
+from .models import Item
 
 
 class HomePageTest(TestCase):
@@ -23,15 +23,46 @@ class HomePageTest(TestCase):
 
         self.assertTemplateUsed(response, 'home.html')
 
+    def test_only_saves_items_when_necessary(self):
+        """"""
+        response = self.client.get('/')
+        self.assertEqual(Item.objects.count(), 0)
+
     def test_can_save_a_post_request(self):
-        """UT:保存用户表单输入的POST请求"""
-        response = self.client.post('/', data={'item_text': 'A new list item'})
-        self.assertIn('A new list item', response.content.decode())
-        self.assertTemplateUsed(response, 'home.html')
+        """前端UT:保存用户表单输入的POST请求数据"""
+        self.client.post('/', data={'item_text': 'A new list item'})  # 此处的item_text是模板中input的name
+
+        # 断言:POST后的数据数量
+        self.assertEqual(Item.objects.count(), 1)
+
+        # 断言：取出的数据和保存的数据是否相同
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'A new list item')
+
+    def test_redirects_after_post(self):
+        """UT:POST请求后应该重定向到list页面"""
+        response = self.client.post('/', data={'item_text': 'A new list item'})  # 此处的item_text是模板中input的name
+
+        # 重定向到列表页面
+        # 断言：response的状态码
+        self.assertEqual(response.status_code, 302)
+        # 断言：response的location
+        self.assertEqual(response['location'], '/')
+
+    def test_displays_all_list_items(self):
+        """UT：在表格中显示多个待办事项"""
+        Item.objects.create(text='First item to do')
+        Item.objects.create(text='Second item to do')
+
+        response = self.client.get('/')
+
+        self.assertIn('First item to do', response.content.decode())
+        self.assertIn('Second item to do', response.content.decode())
 
 
 class ItemModelTest(TestCase):
     """Model测试:待办事项"""
+
     def test_saving_and_retrieving_items(self):
         first_item = Item()  # 创建对象
         first_item.text = "The first list item"  # 为对象属性赋值
