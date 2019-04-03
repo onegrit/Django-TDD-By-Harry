@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
 from .views import home_page
-from .models import Item
+from .models import Item, List
 
 
 class HomePageTest(TestCase):
@@ -26,17 +26,25 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, 'home.html')
 
 
-class ItemModelTest(TestCase):
+class ListAndItemModelTest(TestCase):
     """Model测试:待办事项"""
 
     def test_saving_and_retrieving_items(self):
+        a_list = List()
+        a_list.save()
+
         first_item = Item()  # 创建对象
         first_item.text = "The first list item"  # 为对象属性赋值
+        first_item.list = a_list
         first_item.save()
 
         second_item = Item()
         second_item.text = "The second list item"
+        second_item.list = a_list
         second_item.save()
+
+        saved_list = List.objects.first()
+        self.assertEqual(saved_list, a_list)
 
         saved_items = Item.objects.all()  # 查询API，all是取回表中全部记录，得到的是类似列表的对象QuerySet
         self.assertEqual(saved_items.count(), 2)
@@ -44,14 +52,17 @@ class ItemModelTest(TestCase):
         first_saved_item = saved_items[0]
         second_saved_item = saved_items[1]
         self.assertEqual(first_item, first_saved_item)
+        self.assertEqual(first_item.list, a_list)
         self.assertEqual(second_saved_item, second_item)
+        self.assertEqual(second_item.list, a_list)
 
 
 class ListViewTest(TestCase):
     def test_displays_all_items(self):
         """UT：在表格中显示多个待办事项"""
-        Item.objects.create(text='First item to do')
-        Item.objects.create(text='Second item to do')
+        a_list = List.objects.create()
+        Item.objects.create(text='First item to do', list=a_list)
+        Item.objects.create(text='Second item to do', list=a_list)
 
         response = self.client.get('/lists/the-only-list-in-the-world/')
 
@@ -67,7 +78,9 @@ class ListViewTest(TestCase):
 class NewListTest(TestCase):
     def test_can_save_a_post_request(self):
         """前端UT:保存用户表单输入的POST请求数据"""
-        self.client.post('/lists/new', data={'item_text': 'A new list item'})  # 此处的item_text是模板中input的name
+        a_list = List.objects.create()
+        self.client.post('/lists/new',
+                         data={'item_text': 'A new list item', 'list': a_list})  # 此处的item_text是模板中input的name
 
         # 断言:POST后的数据数量
         self.assertEqual(Item.objects.count(), 1)
