@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
@@ -6,16 +8,16 @@ from .models import Item
 
 
 class HomePageTest(TestCase):
-
-    def test_home_page_returns_correct_html(self):
-        """UT:确保视图函数返回正确的html"""
-        response = self.client.get('/')  # 把HttpRequest交由视图函数处理，返回response
-
-        html = response.content.decode('utf8')  # 解码response
-
-        self.assertTrue(html.startswith('<!DOCTYPE html>'))
-        self.assertIn('To-Do', html)
-        self.assertTrue(html.endswith('</html>'))
+    # @skip
+    # def test_home_page_returns_correct_html(self):
+    #     """UT:确保视图函数返回正确的html"""
+    #     response = self.client.get('/')  # 把HttpRequest交由视图函数处理，返回response
+    #
+    #     html = response.content.decode('utf8')  # 解码response
+    #
+    #     self.assertTrue(html.startswith('<!DOCTYPE html>'))
+    #     self.assertIn('To-Do', html)
+    #     self.assertTrue(html.endswith('</html>'))
 
     def test_uses_home_template(self):
         """UT:测试根路径URL使用了正确的模板"""
@@ -47,17 +49,7 @@ class HomePageTest(TestCase):
         # 断言：response的状态码
         self.assertEqual(response.status_code, 302)
         # 断言：response的location
-        self.assertEqual(response['location'], '/')
-
-    def test_displays_all_list_items(self):
-        """UT：在表格中显示多个待办事项"""
-        Item.objects.create(text='First item to do')
-        Item.objects.create(text='Second item to do')
-
-        response = self.client.get('/')
-
-        self.assertIn('First item to do', response.content.decode())
-        self.assertIn('Second item to do', response.content.decode())
+        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
 
 
 class ItemModelTest(TestCase):
@@ -79,3 +71,20 @@ class ItemModelTest(TestCase):
         second_saved_item = saved_items[1]
         self.assertEqual(first_item, first_saved_item)
         self.assertEqual(second_saved_item, second_item)
+
+
+class ListViewTest(TestCase):
+    def test_displays_all_items(self):
+        """UT：在表格中显示多个待办事项"""
+        Item.objects.create(text='First item to do')
+        Item.objects.create(text='Second item to do')
+
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+
+        self.assertContains(response, 'First item to do')
+        self.assertContains(response, 'Second item to do')
+
+    def test_use_list_template(self):
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+
+        self.assertTemplateUsed(response, 'list.html')

@@ -87,7 +87,7 @@ class NewVisitorTest(LiveServerTestCase):  # 测试组织成类的形式，继�
         self.wait_for_row_in_list_table("1: Buy peacock feathers")
         self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly")
 
-        self.fail('Finish the test!')
+        # self.fail('Finish the test!')
 
     def test_multiple_user_can_start_lists_at_different_urls(self):
         """多个用户拥有自己的清单列表URL"""
@@ -118,7 +118,7 @@ class NewVisitorTest(LiveServerTestCase):  # 测试组织成类的形式，继�
         # Francis 访问首页
         # 在页面中看不到Edith的清单
         self.browser.get(self.live_server_url)
-        page_text = self.browser.find_elements_by_tag_name('body').text
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
 
