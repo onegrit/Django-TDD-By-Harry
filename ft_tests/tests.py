@@ -1,12 +1,13 @@
 import time
 
+from django.test import LiveServerTestCase
 from selenium import webdriver
 import unittest
 
 from selenium.webdriver.common import keys
 
 
-class NewVisitorTest(unittest.TestCase):  # 测试组织成类的形式，继承自TestCase
+class NewVisitorTest(LiveServerTestCase):  # 测试组织成类的形式，继承自TestCase
     def setUp(self):
         self.browser = webdriver.Firefox()
 
@@ -23,7 +24,7 @@ class NewVisitorTest(unittest.TestCase):  # 测试组织成类的形式，继承
         """FT:用户使用待办事项功能"""
         # Edith 听说有一个很酷的在线待办事项应用
         # 她来到这个网站，首先看到了首页
-        self.browser.get('http://localhost:8010')
+        self.browser.get(self.live_server_url)
         # 她注意到网页的标题和头部都包含“To-Do”这个词
         self.assertIn("To-Do", self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -79,7 +80,7 @@ class NewVisitorTest(unittest.TestCase):  # 测试组织成类的形式，继承
         # 她访问这个URL，发现她的待办事项还在
 
         # 她很满意，去睡觉了
+        # TODO：隔离功能测试
+        #  功能测试使用的是真正的数据库（不像单元测试），运行功能测试后，待办事项一直存在于数据库中，这会影响下次测试的结果；应确保功能测试之间相互隔离
+        # 解决办法：使用LiveServerTestCase
 
-
-if __name__ == '__main__':
-    unittest.main()
