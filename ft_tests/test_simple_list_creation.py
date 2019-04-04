@@ -1,40 +1,10 @@
-import os
-import time
-
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import LiveServerTestCase
 from selenium import webdriver
-import unittest
-
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common import keys
+from .base import FunctionalTest
 
-MAX_WAIT = 10
 
-
-class NewVisitorTest(StaticLiveServerTestCase):  # 测试组织成类的形式，继承自TestCase
-    def setUp(self):
-        self.browser = webdriver.Firefox()
-        staging_server = os.environ.get('STAGING_SERVER')
-        if staging_server:
-            self.live_server_url = 'http://' + staging_server
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def wait_for_row_in_list_table(self, row_text):
-        """使用隐世等待方式，显示列表中的行,消除显示等待time.sleep"""
-        start_time = time.time()
-        while True:
-            try:
-                table = self.browser.find_element_by_id('id_list_table')
-                rows = table.find_elements_by_tag_name('tr')
-                self.assertIn(row_text, [row.text for row in rows])
-                return
-            except (AssertionError, WebDriverException) as e:
-                if time.time() - start_time > MAX_WAIT:
-                    raise e
-                time.sleep(0.5)
+class NewVisitorTest(FunctionalTest):  # 测试组织成类的形式，继承自TestCase
+    """User Story"""
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         """FT:用户使用待办事项功能"""
@@ -149,6 +119,3 @@ class NewVisitorTest(StaticLiveServerTestCase):  # 测试组织成类的形式�
         # TODO：隔离功能测试【SOLVED】
         # 功能测试使用的是真正的数据库（不像单元测试），运行功能测试后，待办事项一直存在于数据库中，这会影响下次测试的结果；应确保功能测试之间相互隔离
         # 解决办法：使用LiveServerTestCase
-
-    def test_layout_and_styling(self):
-        self.browser.get(self.live_server_url)
