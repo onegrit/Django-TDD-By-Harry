@@ -3,8 +3,8 @@ from unittest import skip
 from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
-from .views import home_page
-from .models import Item, List
+from lists.views import home_page
+from lists.models import Item, List
 
 
 class HomePageTest(TestCase):
